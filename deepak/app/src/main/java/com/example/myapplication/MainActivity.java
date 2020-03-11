@@ -7,22 +7,32 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
 import android.content.Intent;
+
 import android.os.Bundle;
-import android.speech.RecognizerIntent;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
+
 import android.widget.Button;
+
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-
-    Button btn1,btn2,btn3,btn4,btn5,btn6,btn7,btn8,btn9,btn0,btnAdd,btnSubtract,btnDivide,btnMultiply,btnEqual,btnClear,btnBracket,btnDot,btnPercent;
-    TextView tvInput,tvOutput;
+    TextToSpeech mTTS;
+    Button btn1,btn2,btn3,btn4,btn5,btn6,btn7,btn8,btn9,btn0,btnAdd,btnSubtract,btnDivide,btnMultiply,btnEqual,btnClear,btnBracket,btnDot,btnAllClear;
+    TextView tvOutput;
+    EditText tvInput;
     ImageButton btnSpeak;
     String process;
     boolean checkBracket=false;
@@ -46,9 +56,9 @@ public class MainActivity extends AppCompatActivity {
         btnSubtract=findViewById(R.id.btnSubtract);
         btnMultiply=findViewById(R.id.btnMultiply);
         btnDivide=findViewById(R.id.btnDivide);
-        btnPercent=findViewById(R.id.btnPercent);
-
         btnClear=findViewById(R.id.btnClear);
+
+        btnAllClear=findViewById(R.id.btnAllClear);
         btnBracket=findViewById(R.id.btnBracket);
         btnDot=findViewById(R.id.btnDot);
         btnEqual=findViewById(R.id.btnEqual);
@@ -57,11 +67,43 @@ public class MainActivity extends AppCompatActivity {
         tvInput=findViewById(R.id.tvInput);
         tvOutput=findViewById(R.id.tvOutput);
 
-        btnClear.setOnClickListener(new View.OnClickListener() {
+
+        mTTS = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status==TextToSpeech.SUCCESS){
+                    int result =mTTS.setLanguage(Locale.ENGLISH);
+
+                    if(result==TextToSpeech.LANG_MISSING_DATA||result == TextToSpeech.LANG_NOT_SUPPORTED){
+                        Log.e("TTS","LANGUAGE NOT SUPPORTED");
+
+                    }else{
+                        btnEqual.setEnabled(true);
+                    }
+                }else{
+                    Log.e("TTS","INITIALIZATION FIALED");
+                }
+            }
+
+        });
+
+
+        btnAllClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 tvInput.setText("");
                 tvOutput.setText("");
+            }
+        });
+        btnClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!tvInput.getText().toString().equals("")){
+                    String value=tvInput.getText().toString();
+                    if(value.length()>0){
+                        value=value.substring(0,value.length()-1);
+                    }
+                }
             }
         });
 
@@ -170,13 +212,7 @@ public class MainActivity extends AppCompatActivity {
                 tvInput.setText(process+".");
             }
         });
-        btnPercent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                process=tvInput.getText().toString();
-                tvInput.setText(process+"%");
-            }
-        });
+
         btnBracket.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -224,11 +260,26 @@ public class MainActivity extends AppCompatActivity {
                 finalresult = "0";
             }
                 tvOutput.setText(finalresult);
+                speak();
             }
+
 
         });
 
+
         }
+
+    private void speak(){
+        String text=tvOutput.getText().toString();
+        mTTS.speak(text,TextToSpeech.QUEUE_FLUSH,null);
+    }
+    protected void onDestroy() {
+        if(mTTS!=null){
+            mTTS.stop();
+            mTTS.shutdown();
+        }
+        super.onDestroy();
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

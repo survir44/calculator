@@ -10,10 +10,10 @@
         android:columnCount="6"
     >
         <Button
-            android:id="@+id/btnClear"
+            android:id="@+id/btnAllClear"
             android:layout_width="wrap_content"
             android:layout_height="100dp"
-            android:text="C"
+            android:text="AC"
             android:layout_columnWeight="1"
             android:textSize="25sp"
             android:textColor="@color/white"
@@ -30,18 +30,18 @@
             android:textColor="@color/white"
             android:background="@color/black"
             android:layout_row="0"
-            android:layout_column="1"/>
+            android:layout_column="2"/>
         <Button
-            android:id="@+id/btnPercent"
+            android:id="@+id/btnClear"
             android:layout_width="wrap_content"
             android:layout_height="100dp"
-            android:text="%"
+            android:text="C"
             android:textSize="25sp"
             android:layout_columnWeight="1"
             android:textColor="@color/white"
             android:background="@color/black"
             android:layout_row="0"
-            android:layout_column="2"/>
+            android:layout_column="1"/>
         <Button
             android:id="@+id/btnDivide"
             android:layout_width="wrap_content"
